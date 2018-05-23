@@ -17,6 +17,7 @@ curl --silent https://raw.githubusercontent.com/tommartensen/raspbian-minimal-de
 1. Clone this repository onto your Raspberry Pi. 
 1. Run `make install` to install dependencies. 
    **WARNING**: This reboots the Raspberry as needed for activation of SPI.
+1. Run `source berry.env` after you filled in the necessary information.
 
 ## Acknowledgements
 * [mxgxw](https://github.com/mxgxw/MFRC522-python/blob/master/LICENSE.txt) for the NFC reader module

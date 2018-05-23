@@ -1,9 +1,7 @@
 run:
-	sh berry.env
 	sudo -E python3 run.py
 
 configure:
-	sh berry.env
 	python3 setup.py
 
 install:
