@@ -19,6 +19,10 @@ curl --silent https://raw.githubusercontent.com/tommartensen/raspbian-minimal-de
    **WARNING**: This reboots the Raspberry as needed for activation of SPI.
 1. Run `source berry.env` after you filled in the necessary information.
 
+
+## Running
+1. Run `make run`. The execution logs will be available in standard output and `logs/execution.log`.
+
 ## Acknowledgements
 * [mxgxw](https://github.com/mxgxw/MFRC522-python/blob/master/LICENSE.txt) for the NFC reader module
 * [MaximilianV](https://github.com/MaximilianV/thingberry/blob/master/LICENSE) for the basic Thingberry

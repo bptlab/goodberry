@@ -2,12 +2,17 @@ from component import ActionComponent, ObserverComponent
 from .lib.MFRC522 import MFRC522
 import RPi.GPIO as GPIO
 import time
-import logging
+from utils import get_logger
 
 
 class NfcComponent(ActionComponent, ObserverComponent):
+    def __init__(self, device_id):
+        self.logger = get_logger(__name__)
+        ActionComponent.__init__(self, device_id)
+        ObserverComponent.__init__(self, device_id)
+
     def trigger_action(self, **kwargs):
-        print(kwargs)
+        self.logger.info(kwargs)
         continue_reading = True
         MIFAREReader = MFRC522()
 
@@ -15,11 +20,11 @@ class NfcComponent(ActionComponent, ObserverComponent):
         while continue_reading:
             (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
             if status == MIFAREReader.MI_OK:
-                print("Card detected")
+                self.logger.info("Card detected")
             (status, uid) = MIFAREReader.MFRC522_Anticoll()
 
             if status == MIFAREReader.MI_OK:
-                print("Card read UID: " + str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3]))
+                self.logger.info("Card read UID: " + str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3]))
                 # This is the default key for authentication
                 key = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
                 # Select the scanned tag
@@ -37,7 +42,7 @@ class NfcComponent(ActionComponent, ObserverComponent):
                             data.append(ord(timestamp[x]))
                         else:
                             data.append(0x00)
-                    print("Sector 8 will now be filled with 0xFF:")
+                    self.logger.info("Sector 8 will now be filled with 0xFF:")
                     # Write the data
                     MIFAREReader.MFRC522_Write(8, data)
                     # Stop
@@ -46,7 +51,7 @@ class NfcComponent(ActionComponent, ObserverComponent):
                     self.connector.reset_action(self.device_id, self.action_name)
                     continue_reading = False
                 else:
-                    print("Authentication error")
+                    self.logger.info("Authentication failed.")
 
     def observe(self, **kwargs):
         continue_reading = True
@@ -59,13 +64,13 @@ class NfcComponent(ActionComponent, ObserverComponent):
             (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
             # If a card is found
             if status == MIFAREReader.MI_OK:
-                print("Card detected")
+                self.logger.info("Card detected")
             # Get the UID of the card
             (status, uid) = MIFAREReader.MFRC522_Anticoll()
             # If we have the UID, continue
             if status == MIFAREReader.MI_OK:
                 # Print UID
-                print("Card read UID: " + str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3]))
+                self.logger.info("Card read UID: " + str(uid[0]) + "," + str(uid[1]) + "," + str(uid[2]) + "," + str(uid[3]))
                 # This is the default key for authentication
                 key = [0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF]
                 # Select the scanned tag
@@ -82,20 +87,20 @@ class NfcComponent(ActionComponent, ObserverComponent):
                             card_value += chr(x)
                     if card_value == "":
                         card_value = "0"
-                    logging.info("Read " + card_value)
+                    self.logger.info("Read " + card_value)
                     if card_value != last_read_value:
                         last_read_value = card_value
-                        logging.info("Updated device")
+                        self.logger.info("Updated device")
                         nfc_feature_content = dict()
                         nfc_feature_content["properties"] = dict()
                         nfc_feature_content["properties"]["lastTriggered"] = self.get_timestamp()
                         nfc_feature_content["properties"]["lastReadId"] = card_value
                         self.connector.update_feature(self.device_id, self.feature_name, nfc_feature_content)
                     else:
-                        logging.info("No update needed")
+                        self.logger.info("No update needed")
                 else:
-                    print("Authentication error")
-            print("Reading")
+                    self.logger.info("Authentication error")
+            self.logger.info("Reading")
             time.sleep(1)
 
     @staticmethod

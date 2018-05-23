@@ -1,11 +1,10 @@
 from .component import Component
 from threading import Thread
-import logging
 
 
 class ObserverComponent(Component):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, device_id, **kwargs):
+        super().__init__(device_id, **kwargs)
         self.feature_name = None
         self.property_name = None
         self.property_config = None
@@ -19,7 +18,7 @@ class ObserverComponent(Component):
         self.connector.update_property(self.device_id, self.feature_name, self.property_name, new_value)
 
     def start_observe(self, **kwargs):
-        logging.info("Start observer for " + self.feature_name + "/" + self.property_name)
+        self.logger.info("Start observer for " + self.feature_name + "/" + self.property_name)
         thread = Thread(target=self.observe, kwargs=kwargs)
         thread.daemon = True
         thread.start()

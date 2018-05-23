@@ -1,11 +1,10 @@
 from .component import Component
 from threading import Thread
-import logging
 
 
 class ActionComponent(Component):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+    def __init__(self, device_id, **kwargs):
+        super().__init__(device_id, **kwargs)
         self.action_name = None
         self.action_config = None
 
@@ -14,7 +13,7 @@ class ActionComponent(Component):
         self.action_config = action_config
 
     def start_action(self, **kwargs):
-        logging.info("Start action for " + self.action_name)
+        self.logger.info("Start action for " + self.action_name)
         thread = Thread(target=self.trigger_action, kwargs=kwargs)
         thread.daemon = True
         thread.start()

@@ -2,9 +2,12 @@ import asyncio
 import logging
 import json
 import time
+from utils import get_logger
+
 
 class ChangeServer:
     def __init__(self, runner):
+        self.logger = get_logger(__name__)
         self.runner = runner
 
     def start_watching(self):
@@ -16,7 +19,7 @@ class ChangeServer:
         while True:
             i += 1
             time.sleep(5)
-            logging.info("{'name': 'test', 'device_id': 'default:TestDevice', 'feature': 'nfcwriter', 'property': 'nfcwriter', 'value': 'Test'}")
+            self.logger.info("{'name': 'test', 'device_id': 'default:TestDevice', 'feature': 'nfcwriter', 'property': 'nfcwriter', 'value': 'Test'}")
             self.handle_message('{"name": "test", "device_id": "default:TestDevice", "feature": "nfcwriter", "property": "nfcwriter", "value": "Test"}')
 
     def handle_message(self, message):

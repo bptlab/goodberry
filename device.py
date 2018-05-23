@@ -13,6 +13,7 @@ class Device:
     """
 
     def __init__(self):
+        self.logger = utils.get_logger(__name__)
         self.settings = dict()
         self.settings["namespace"] = os.getenv("DEVICE_NS", "default")
         self.settings["features"] = {}
@@ -100,13 +101,13 @@ class Device:
         if not isinstance(value, bool):
             if str(value) == str(self.get_current_property_value(feature_name, property_name)):
                 return
-            print("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(value) + ".")
+            self.logger.info("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(value) + ".")
             self.features[feature_name]["properties"][property_name]["value"] = str(value)
             self.connector.update_property(self.id, feature_name, property_name, value)
         else:
             if value:
                 current_count = int(self.features[feature_name]["properties"][property_name]["value"]) + 1
-                print("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(current_count) + ".")
+                self.logger.info("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(current_count) + ".")
                 self.features[feature_name]["properties"][property_name]["value"] = str(current_count)
                 self.connector.update_property(self.id, feature_name, property_name, str(current_count))
 

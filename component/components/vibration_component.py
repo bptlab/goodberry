@@ -2,9 +2,14 @@ from component import ObserverComponent
 import logging
 import RPi.GPIO as GPIO
 import time
+from utils import get_logger
 
 
 class VibrationComponent(ObserverComponent):
+    def __init__(self):
+        self.logger = get_logger(__name__)
+        super().__init__()
+
     def start_observe(self, **kwargs):
         channel = int(self.property_config["pin"])
         GPIO.setmode(GPIO.BOARD)

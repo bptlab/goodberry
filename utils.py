@@ -1,3 +1,4 @@
+import logging
 import os
 import re
 from enum import Enum
@@ -104,6 +105,17 @@ def input_require_int(raw_input):
                 raise ValueError
         except ValueError:
             raw_input = input("Please input a valid number\n")
+
+
+def get_logger(class_name):
+    logging.basicConfig(
+        level=logging.INFO,
+        format='{"timestamp": "%(asctime)s", "relative_time": "%(relativeCreated)d", "thread":, "%(threadName)s" , "level": "%(levelname)s", "class": "%(name)s",  "message": "%(message)s"}',
+        handlers=[
+            logging.FileHandler("{0}/{1}.log".format("logs", "execution")),
+            logging.StreamHandler()
+        ])
+    return logging.getLogger(class_name)
 
 
 class DeviceArtifact(Enum):

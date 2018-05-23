@@ -1,4 +1,5 @@
 run:
+	mkdir -p logs
 	sudo -E python3 run.py
 
 configure:
