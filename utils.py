@@ -1,5 +1,20 @@
+import os
 import re
 from enum import Enum
+
+
+def settings_exist():
+    settings_file = os.getenv("SETTINGS_PATH", "")
+    if not settings_file:
+        raise Exception("Settings path not configured.")
+    return os.path.exists(settings_file)
+
+
+def get_settings_file():
+    settings_file = os.getenv("SETTINGS_PATH", "")
+    if not settings_file:
+        raise Exception("Settings path not configured.")
+    return settings_file
 
 
 def ask_yes_no_question(question):
@@ -91,9 +106,9 @@ def input_require_int(raw_input):
             raw_input = input("Please input a valid number\n")
 
 
-class ThingArtifact(Enum):
+class DeviceArtifact(Enum):
     """
-    This enum defines what different kind of artifacts a Thing can have and is used during setup process to
+    This enum defines what different kind of artifacts a device can have and is used during setup process to
     simplify the code.
     """
     Attribute = 1

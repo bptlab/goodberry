@@ -22,7 +22,7 @@ class CameraComponent(ActionComponent):
         camera.capture(image_destination)
         logging.info("Photo taken and stored in " + str(image_destination) + ".")
         camera.close()
-        self.connector.reset_action(self.thing_id, self.action_name)
+        self.connector.reset_action(self.device_id, self.action_name)
         ip_address = ([l for l in ([ip for ip in socket.gethostbyname_ex(socket.gethostname())[2]
                                     if not ip.startswith("127.")][:1], [[(s.connect(('8.8.8.8', 53)),
                                                                           s.getsockname()[0], s.close()) for s in
@@ -32,14 +32,13 @@ class CameraComponent(ActionComponent):
         camera_feature_content["properties"] = dict()
         camera_feature_content["properties"]["lastTriggered"] = self.get_timestamp()
         camera_feature_content["properties"]["lastPictureUrl"] = "http://" + ip_address + "/images/" + filename
-        logging.info(self.connector.update_feature(self.thing_id, "camera", camera_feature_content))
+        logging.info(self.connector.update_feature(self.device_id, "camera", camera_feature_content))
 
     @staticmethod
     def configure_action():
         print("Configuring Camera Action:")
         delay = int(input("Delay until photo is taken (def. 2): "))
         destination = input("Destination to save image: ")
-        ip_address = input("What's the current IP address? ")
         return {
             "delay": delay,
             "destination": destination

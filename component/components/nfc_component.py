@@ -7,6 +7,7 @@ import logging
 
 class NfcComponent(ActionComponent, ObserverComponent):
     def trigger_action(self, **kwargs):
+        print(kwargs)
         continue_reading = True
         MIFAREReader = MFRC522()
 
@@ -42,7 +43,7 @@ class NfcComponent(ActionComponent, ObserverComponent):
                     # Stop
                     MIFAREReader.MFRC522_StopCrypto1()
                     # Make sure to stop reading for cards
-                    self.connector.reset_action(self.thing_id, self.action_name)
+                    self.connector.reset_action(self.device_id, self.action_name)
                     continue_reading = False
                 else:
                     print("Authentication error")
@@ -54,6 +55,7 @@ class NfcComponent(ActionComponent, ObserverComponent):
         last_read_value = ""
         # This loop keeps checking for chips. If one is near it will get the UID and authenticate
         while continue_reading:
+
             (status, TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
             # If a card is found
             if status == MIFAREReader.MI_OK:
@@ -83,16 +85,17 @@ class NfcComponent(ActionComponent, ObserverComponent):
                     logging.info("Read " + card_value)
                     if card_value != last_read_value:
                         last_read_value = card_value
-                        logging.info("Updated thing")
+                        logging.info("Updated device")
                         nfc_feature_content = dict()
                         nfc_feature_content["properties"] = dict()
                         nfc_feature_content["properties"]["lastTriggered"] = self.get_timestamp()
                         nfc_feature_content["properties"]["lastReadId"] = card_value
-                        self.connector.update_feature(self.thing_id, self.feature_name, nfc_feature_content)
+                        self.connector.update_feature(self.device_id, self.feature_name, nfc_feature_content)
                     else:
-                        logging.info("No updated needed")
+                        logging.info("No update needed")
                 else:
                     print("Authentication error")
+            print("Reading")
             time.sleep(1)
 
     @staticmethod

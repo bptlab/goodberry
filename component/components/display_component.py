@@ -20,5 +20,5 @@ class DisplayComponent(ActionComponent):
 
     @staticmethod
     def configure_action():
-        print("The Display Action doesn't need to be configured.")
+        logging.info("The Display Action doesn't need to be configured.")
         return {}

@@ -16,7 +16,7 @@ class ObserverComponent(Component):
         self.property_config = property_config
 
     def update_property(self, new_value):
-        self.connector.update_property(self.thing_id, self.feature_name, self.property_name, new_value)
+        self.connector.update_property(self.device_id, self.feature_name, self.property_name, new_value)
 
     def start_observe(self, **kwargs):
         logging.info("Start observer for " + self.feature_name + "/" + self.property_name)

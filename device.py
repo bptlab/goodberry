@@ -1,25 +1,24 @@
 import re
 import json
-from pathlib import Path
-from thingconnector import ThingConnector, settings
+import os
+from connector import Connector
 from component.components import Components
-from utils import ThingArtifact
+from utils import DeviceArtifact
+import utils
 
 
-class Thing:
-    """This class represents the thing.
-    It handles settings and can start synchronization to the thing cloud.
+class Device:
+    """This class represents the device.
+    It handles settings.
     """
-    SETTINGS_FILE = "thing-settings.json"
 
     def __init__(self):
         self.settings = dict()
-        self.settings["namespace"] = settings.namespace
+        self.settings["namespace"] = os.getenv("DEVICE_NS", "default")
         self.settings["features"] = {}
         self.settings["attributes"] = {}
         self.settings["actions"] = {}
-        self.thingconnector = ThingConnector()
-        print("A new thing!")
+        self.connector = Connector()
 
     @property
     def name(self):
@@ -57,20 +56,20 @@ class Thing:
     @property
     def id(self):
         """
-        Build the thing id out of the set namespace and chosen name.
-        :return: a string containing the thing id
+        Build the device id out of the set namespace and chosen name.
+        :return: a string containing the device id
         :rtype: basestring
         """
         return self.namespace + ":" + self.name
 
     def add_artifact(self, artifact, artifact_name, parent_artifact_name=None):
-        if artifact == ThingArtifact.Feature:
+        if artifact == DeviceArtifact.Feature:
             self.add_feature(artifact_name)
-        if artifact == ThingArtifact.Property:
+        if artifact == DeviceArtifact.Property:
             self.add_property(parent_artifact_name, artifact_name)
-        if artifact == ThingArtifact.Attribute:
+        if artifact == DeviceArtifact.Attribute:
             self.add_attribute(artifact_name)
-        if artifact == ThingArtifact.Action:
+        if artifact == DeviceArtifact.Action:
             self.add_action(artifact_name)
 
     def add_feature(self, feature_name):
@@ -101,15 +100,15 @@ class Thing:
         if not isinstance(value, bool):
             if str(value) == str(self.get_current_property_value(feature_name, property_name)):
                 return
-            print("THING: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(value) + ".")
+            print("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(value) + ".")
             self.features[feature_name]["properties"][property_name]["value"] = str(value)
-            self.thingconnector.update_property(self.id, feature_name, property_name, value)
+            self.connector.update_property(self.id, feature_name, property_name, value)
         else:
             if value:
                 current_count = int(self.features[feature_name]["properties"][property_name]["value"]) + 1
-                print("THING: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(current_count) + ".")
+                print("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(current_count) + ".")
                 self.features[feature_name]["properties"][property_name]["value"] = str(current_count)
-                self.thingconnector.update_property(self.id, feature_name, property_name, str(current_count))
+                self.connector.update_property(self.id, feature_name, property_name, str(current_count))
 
     def get_list_of_features(self):
         feature_list = []
@@ -140,7 +139,7 @@ class Thing:
 
     def get_action_object(self, action_name):
         action_config = self.get_action_config(action_name)
-        action_object = Components[action_config["type"]].value(thing_id=self.id)
+        action_object = Components[action_config["type"]].value(device_id=self.id)
         action_object.init_action(action_name=action_name, action_config=action_config)
         return action_object
 
@@ -153,7 +152,7 @@ class Thing:
 
     def get_observer_object(self, feature_name, property_name):
         observer_config = self.get_property_config(feature_name, property_name)
-        observer_object = Components[observer_config["type"]].value(thing_id=self.id)
+        observer_object = Components[observer_config["type"]].value(device_id=self.id)
         observer_object.init_observer(feature_name=feature_name, property_name=property_name, property_config=observer_config)
         return observer_object
 
@@ -161,26 +160,12 @@ class Thing:
         """
         Saves the settings dictionary to disk.
         """
-        with open(self.SETTINGS_FILE, 'w') as fp:
+        with open(utils.get_settings_file(), 'w') as fp:
             json.dump(self.settings, fp)
 
     def load_settings(self):
         """
         Loads settings dictionary from disk.
         """
-        with open(self.SETTINGS_FILE, 'r') as fp:
+        with open(utils.get_settings_file(), 'r') as fp:
             self.settings = json.load(fp)
-
-    def create(self):
-        print(self.thingconnector.create_thing(self))
-
-    @staticmethod
-    def do_settings_exist():
-        """
-        Checks whether there already is a settings file for thingberry.
-        :return: whether a settings file exist
-        :rtype: boolean
-        """
-        if Path(Thing.SETTINGS_FILE).is_file():
-            return True
-        return False

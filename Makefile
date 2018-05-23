@@ -1,5 +1,10 @@
 run:
-	sudo python3 run.py
+	sh berry.env
+	sudo -E python3 run.py
+
+configure:
+	sh berry.env
+	python3 setup.py
 
 install:
 	sudo pip3 install -r requirements.txt
@@ -8,3 +13,7 @@ install:
 	cd component/components/lib && wget http://tutorials-raspberrypi.de/wp-content/uploads/scripts/hd44780_i2c.zip -O temp.zip; unzip -o temp.zip; rm temp.zip
 	sed -i -e 's/import i2c_lib/from component.components.lib import i2c_lib/g' component/components/lib/lcddriver.py
 	2to3 -w component/components/lib/MFRC522.py
+	sudo sed -i -e 's/\#dtparam=spi=on/dtparam=spi=on/g' /boot/config.txt
+	echo "Restarting server..."
+	sleep 10
+	sudo reboot
