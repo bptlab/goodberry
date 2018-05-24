@@ -6,9 +6,9 @@ from utils import get_logger
 
 
 class VibrationComponent(ObserverComponent):
-    def __init__(self):
+    def __init__(self, device_id):
         self.logger = get_logger(__name__)
-        super().__init__()
+        ObserverComponent.__init__(self, device_id)
 
     def start_observe(self, **kwargs):
         channel = int(self.property_config["pin"])

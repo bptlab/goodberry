@@ -5,9 +5,9 @@ from utils import get_logger
 
 
 class DisplayComponent(ActionComponent):
-    def __init__(self):
+    def __init__(self, device_id):
         self.logger = get_logger(__name__)
-        super().__init__()
+        ActionComponent.__init__(self, device_id)
 
     def trigger_action(self, value, **kwargs):
         lcd = LCD()

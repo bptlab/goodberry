@@ -8,9 +8,9 @@ from utils import get_logger
 
 
 class CameraComponent(ActionComponent):
-    def __init__(self):
+    def __init__(self, device_id):
         self.logger = get_logger(__name__)
-        super().__init__()
+        ActionComponent.__init__(self, device_id)
 
     def trigger_action(self, **kwargs):
         delay = int(self.action_config["delay"])
