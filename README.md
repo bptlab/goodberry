@@ -7,11 +7,14 @@ This service implements multiple IoT sensors and actuators on a Raspberry Pi. Th
 * Binary (called vibration) (Observer)
 
 ## Requirements
-* Raspberry Pi with possibility to connect a GPIO board and [Raspbian](https://www.raspberrypi.org/downloads/raspbian/). The image must be flashed onto a microSD card.
+* Raspberry with [Raspbian](https://www.raspberrypi.org/downloads/raspbian/). The image must be flashed onto a microSD card.
 * Minimal development environment. To install this, execute 
 ```
 curl --silent https://raw.githubusercontent.com/tommartensen/raspbian-minimal-dev/master/raspbian-setup.sh | sh
 ```
+
+## Wiring
+Refer to [the wire file](docs/HOW_TO_WIRE.md).
 
 ## Installation
 1. Clone this repository onto your Raspberry Pi. 
