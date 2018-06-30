@@ -1,6 +1,7 @@
 import re
 import json
 from component.components import Components
+from connector import Connector
 from utils import DeviceArtifact
 import utils
 
@@ -17,6 +18,7 @@ class Device:
         self.settings["features"] = {}
         self.settings["attributes"] = {}
         self.settings["actions"] = {}
+        self.connector = Connector()
 
     @property
     def name(self):
@@ -166,4 +168,5 @@ class Device:
         Loads settings dictionary from disk.
         """
         with open(utils.get_settings_file(), 'r') as fp:
-            self.settings = json.load(fp)
+            settings_from_disk = json.load(fp)
+            self.settings = {**self.settings, **settings_from_disk}
