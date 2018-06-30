@@ -1,7 +1,5 @@
 import re
 import json
-import os
-from connector import Connector
 from component.components import Components
 from utils import DeviceArtifact
 import utils
@@ -15,11 +13,10 @@ class Device:
     def __init__(self):
         self.logger = utils.get_logger(__name__)
         self.settings = dict()
-        self.settings["namespace"] = os.getenv("DEVICE_NS", "default")
+        self.settings["namespace"] = "default"
         self.settings["features"] = {}
         self.settings["attributes"] = {}
         self.settings["actions"] = {}
-        self.connector = Connector()
 
     @property
     def name(self):

@@ -1,6 +1,7 @@
 import sys
+
+from connector.goodstag_adapter import GoodstagAdapter
 from device import Device
-from connector import ChangeServer
 import utils
 from setup import main as setup
 
@@ -13,7 +14,7 @@ class Run:
         except Exception:
             sys.exit(1)
         self.device.load_settings()
-        self.watcher = ChangeServer(self)
+        self.watcher = GoodstagAdapter(self.device, "Goodberry")
         self.observer = self.device.get_observers()
         self.actions = self.device.get_actions()
         self.logger.info("Loaded " + str(len(self.observer)) + " observer(s) and " + str(len(self.actions)) + " action(s).")
