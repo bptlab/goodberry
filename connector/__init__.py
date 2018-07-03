@@ -1,2 +1,2 @@
-from connector.connector import Connector
-from connector.changeserver import ChangeServer
+from connector.event_listener import EventListener
+from connector.event_subscriber import EventSubscriber

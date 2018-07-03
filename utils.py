@@ -72,7 +72,7 @@ def ask_choose_index_from_list_or_new(a_list):
     return index - 1
 
 
-def input_require_match_reqex(regex, raw_input):
+def input_require_match_regex(regex, raw_input):
     """
     Utility function that requires a given input to match a given regular expression.
     In case the expression is not met, ask the user to repeat the input in a valid format.
@@ -83,7 +83,7 @@ def input_require_match_reqex(regex, raw_input):
     :return: the user input matching the given expression
     :rtype: str
     """
-    while not re.match("^[_a-zA-Z][_a-zA-Z0-9\-]*$", raw_input):
+    while not re.match(regex, raw_input):
         raw_input = input("Please input a valid string as name (should match \"" + regex + "\"):\n")
     return raw_input
 

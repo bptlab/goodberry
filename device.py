@@ -1,7 +1,6 @@
 import re
 import json
-import os
-from connector import Connector
+
 from component.components import Components
 from utils import DeviceArtifact
 import utils
@@ -15,11 +14,10 @@ class Device:
     def __init__(self):
         self.logger = utils.get_logger(__name__)
         self.settings = dict()
-        self.settings["namespace"] = os.getenv("DEVICE_NS", "default")
         self.settings["features"] = {}
         self.settings["attributes"] = {}
         self.settings["actions"] = {}
-        self.connector = Connector()
+        self.settings["eventTypes"] = {}
 
     @property
     def name(self):
@@ -32,16 +30,16 @@ class Device:
         self.settings["name"] = name
 
     @property
-    def namespace(self):
-        return self.settings["namespace"]
-
-    @property
     def features(self):
         return self.settings["features"]
 
     @property
     def actions(self):
         return self.settings["actions"]
+
+    @property
+    def event_types(self):
+        return self.settings["eventTypes"]
 
     @property
     def properties(self):
@@ -53,15 +51,6 @@ class Device:
     @property
     def attributes(self):
         return self.settings["attributes"]
-
-    @property
-    def id(self):
-        """
-        Build the device id out of the set namespace and chosen name.
-        :return: a string containing the device id
-        :rtype: basestring
-        """
-        return self.namespace + ":" + self.name
 
     def add_artifact(self, artifact, artifact_name, parent_artifact_name=None):
         if artifact == DeviceArtifact.Feature:
@@ -103,13 +92,20 @@ class Device:
                 return
             self.logger.info("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(value) + ".")
             self.features[feature_name]["properties"][property_name]["value"] = str(value)
-            self.connector.update_property(self.id, feature_name, property_name, value)
         else:
             if value:
                 current_count = int(self.features[feature_name]["properties"][property_name]["value"]) + 1
                 self.logger.info("DEVICE: Update value for \"" + feature_name + "/" + property_name + "\" to " + str(current_count) + ".")
                 self.features[feature_name]["properties"][property_name]["value"] = str(current_count)
-                self.connector.update_property(self.id, feature_name, property_name, str(current_count))
+
+    def add_event_type(self, event_type_name, required_attributes):
+        self.event_types[event_type_name] = {"requiredAttributes": required_attributes}
+
+    def change_network_settings(self, host, port, ssl_enabled, event_source):
+        self.settings["host"] = host
+        self.settings["port"] = port
+        self.settings["sslEnabled"] = ssl_enabled
+        self.settings["eventSource"] = event_source
 
     def get_list_of_features(self):
         feature_list = []
@@ -140,7 +136,7 @@ class Device:
 
     def get_action_object(self, action_name):
         action_config = self.get_action_config(action_name)
-        action_object = Components[action_config["type"]].value(device_id=self.id)
+        action_object = Components[action_config["type"]].value(device_id=self.name)
         action_object.init_action(action_name=action_name, action_config=action_config)
         return action_object
 
@@ -153,7 +149,7 @@ class Device:
 
     def get_observer_object(self, feature_name, property_name):
         observer_config = self.get_property_config(feature_name, property_name)
-        observer_object = Components[observer_config["type"]].value(device_id=self.id)
+        observer_object = Components[observer_config["type"]].value(device_id=self.name)
         observer_object.init_observer(feature_name=feature_name, property_name=property_name, property_config=observer_config)
         return observer_object
 

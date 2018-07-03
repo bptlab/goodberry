@@ -19,7 +19,7 @@ Refer to [the wire file](docs/HOW_TO_WIRE.md).
 ## Installation
 1. Clone this repository onto your Raspberry Pi. 
 1. Run `make install` to install dependencies. 
-   **WARNING**: This reboots the Raspberry as needed for activation of SPI.
+   **WARNING**: If asked, please activate IC2 in the Configuration (key 5). The Raspberry reboots afterwards as needed for activation of SPI.
 1. Run `source berry.env` after you filled in the necessary information.
 
 

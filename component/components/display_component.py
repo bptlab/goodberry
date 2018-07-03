@@ -17,8 +17,7 @@ class DisplayComponent(ActionComponent):
         for i in range(0, len(lines)):
             for ii in range(0, int(math.ceil(len(lines[i])/16))):
                 short_lines.append(lines[i][ii*16:(ii+1)*16])
-        self.logger.info("Displaying:", end="")
-        self.logger.info(short_lines)
+        self.logger.info("Displaying:" + str(short_lines))
         for line_number, line_content in enumerate(short_lines):
             lcd.lcd_display_string(line_content, line_number + 1)
 

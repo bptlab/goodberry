@@ -20,7 +20,7 @@ def request_device_name():
     :rtype: str
     """
     raw_name = input("Please choose a name for your new device:\n")
-    return utils.input_require_match_reqex(DEVICE_NAME_REGEX, raw_name)
+    return utils.input_require_match_regex(DEVICE_NAME_REGEX, raw_name)
 
 
 def setup_artifact(artifact, parent_artifact=None):
@@ -34,7 +34,7 @@ def setup_artifact(artifact, parent_artifact=None):
     :rtype: str
     """
     name = input("Please name the new " + artifact.name + ":\n")
-    name = utils.input_require_match_reqex(FEATURE_PROPERTY_REGEX, name)
+    name = utils.input_require_match_regex(FEATURE_PROPERTY_REGEX, name)
     device.add_artifact(artifact, name, parent_artifact)
     return name
 
@@ -52,6 +52,25 @@ def choose_feature():
     if feature_id is None:
         return setup_artifact(DeviceArtifact.Feature)
     return features[feature_id]
+
+
+def setup_event_type():
+    print("Setting up event types.")
+    event_type_name = utils.input_require_match_regex("^[a-zA-Z][a-zA-Z0-9]*$", input("Please enter the name of the event type: "))
+    should_add_required_attribute = True
+    required_attributes = []
+    while should_add_required_attribute:
+        required_attributes.append(utils.input_require_match_regex("^[a-zA-Z][a-zA-Z0-9]*$", input("Add required attribute name: ")))
+        should_add_required_attribute = utils.ask_yes_no_question("Add another required attribute?")
+    device.add_event_type(event_type_name, required_attributes)
+
+
+def setup_network():
+    host = utils.input_require_match_regex("^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}|[a-zA-Z][a-zA-Z0-9\.\-]*)$", input("Please enter the host you are running on: "))
+    port = utils.input_require_int(input("Please enter the port your application should run on: "))
+    ssl_enabled = utils.ask_yes_no_question("Is ssl enabled?")
+    event_source = utils.input_require_match_regex("^https?://(?:[-\w.]|(?:[\da-fA-F]{2}))+(:\d{,5})?(\/.*)*$", input("Please enter the event source you want to subscribe to: "))
+    device.change_network_settings(host, port, ssl_enabled, event_source)
 
 
 def setup_component():
@@ -99,7 +118,12 @@ def setup_new_device():
     """
     print("The following steps will guide you through the setup of your new raspberry device.")
     device.name = request_device_name()
-    print("Your device id is \"" + device.id + "\".")
+    print("Your device name is \"" + device.name + "\".")
+    setup_network()
+    should_add_event_type = True
+    while should_add_event_type:
+        setup_event_type()
+        should_add_event_type = utils.ask_yes_no_question("\nAdd another event type?")
     should_add_component = True
     while should_add_component:
         setup_component()
@@ -111,7 +135,7 @@ def main():
     This methods leads through the whole setup process for a device.
     After the setup, the user is asked, if the configuration should be saved to disk (necessary for running the device).
     :return: None
-    :rtype: None
+    :rtype: None"
     """
     global device
     device = Device()
