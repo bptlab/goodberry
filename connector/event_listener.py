@@ -13,7 +13,7 @@ class EventListener(BaseHTTPRequestHandler):
 		self.runner = runner
 		self.settings = self.runner.device.settings
 		BaseHTTPRequestHandler.__init__(self, *args)
-		self.server_version = "Goodberry/0.0.1"
+		self.server_version = "Goodberry/1.0.0"
 
 	def do_GET(self):
 		if self.path == "/api/v1/configuration":
