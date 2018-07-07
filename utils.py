@@ -1,5 +1,21 @@
+import logging
+import os
 import re
 from enum import Enum
+
+
+def settings_exist():
+    settings_file = os.getenv("SETTINGS_PATH", "")
+    if not settings_file:
+        raise Exception("Settings path not configured.")
+    return os.path.exists(settings_file)
+
+
+def get_settings_file():
+    settings_file = os.getenv("SETTINGS_PATH", "")
+    if not settings_file:
+        raise Exception("Settings path not configured.")
+    return settings_file
 
 
 def ask_yes_no_question(question):
@@ -56,7 +72,7 @@ def ask_choose_index_from_list_or_new(a_list):
     return index - 1
 
 
-def input_require_match_reqex(regex, raw_input):
+def input_require_match_regex(regex, raw_input):
     """
     Utility function that requires a given input to match a given regular expression.
     In case the expression is not met, ask the user to repeat the input in a valid format.
@@ -67,7 +83,7 @@ def input_require_match_reqex(regex, raw_input):
     :return: the user input matching the given expression
     :rtype: str
     """
-    while not re.match("^[_a-zA-Z][_a-zA-Z0-9\-]*$", raw_input):
+    while not re.match(regex, raw_input):
         raw_input = input("Please input a valid string as name (should match \"" + regex + "\"):\n")
     return raw_input
 
@@ -91,9 +107,20 @@ def input_require_int(raw_input):
             raw_input = input("Please input a valid number\n")
 
 
-class ThingArtifact(Enum):
+def get_logger(class_name):
+    logging.basicConfig(
+        level=logging.INFO,
+        format='{"timestamp": "%(asctime)s", "relative_time": "%(relativeCreated)d", "thread":, "%(threadName)s" , "level": "%(levelname)s", "class": "%(name)s",  "message": "%(message)s"}',
+        handlers=[
+            logging.FileHandler("{0}/{1}.log".format("logs", "execution")),
+            logging.StreamHandler()
+        ])
+    return logging.getLogger(class_name)
+
+
+class DeviceArtifact(Enum):
     """
-    This enum defines what different kind of artifacts a Thing can have and is used during setup process to
+    This enum defines what different kind of artifacts a device can have and is used during setup process to
     simplify the code.
     """
     Attribute = 1
